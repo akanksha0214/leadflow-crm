@@ -1,7 +1,7 @@
 [build]
   base = "leadflow-client"
   command = "npm run build"
-  publish = "leadflow-client/build"
+  publish = "build"     # ← CHANGED: Relative to base directory
 
 [[headers]]
   for = "/*.js"
