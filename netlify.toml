@@ -1,7 +1,7 @@
 [build]
   base = "leadflow-client"
   command = "npm install && npm run build"
-  publish = "build"
+  publish = "dist"
 
 [[headers]]
   for = "/*.js"
