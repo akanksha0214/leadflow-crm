@@ -11,9 +11,16 @@ export const loginUser = createAsyncThunk('auth/loginUser',
 
 //load user after refrsh , it helps to store token in backend and not in local storage
 export const loadUser = createAsyncThunk('/auth/loadUser',
-    async () => {
-        const res = await instance.get('/auth/me');
-        return res.data.user
+    async (_, { rejectWithValue }) => {
+        try {
+            console.log("loadUser: Making request to /auth/me");
+            const res = await instance.get('/auth/me');
+            console.log("loadUser: Response received:", res.data);
+            return res.data.user; // Use res.data.user now that response format is consistent
+        } catch (err) {
+            console.log("loadUser: Error occurred:", err.response?.data || err.message);
+            return rejectWithValue(null);
+        }
     }
 )
 // export const loadUser = createAsyncThunk(
@@ -52,19 +59,27 @@ const authSlice = createSlice({
         builder
             // login
             .addCase(loginUser.fulfilled, (state, action) => {
+                console.log("Redux: loginUser fulfilled", action.payload);
                 state.user = action.payload;
             })
             // load user
+            .addCase(loadUser.pending, (state) => {
+                console.log("Redux: loadUser pending");
+                state.loading = true;
+            })
             .addCase(loadUser.fulfilled, (state, action) => {
+                console.log("Redux: loadUser fulfilled", action.payload);
                 state.user = action.payload;
                 state.loading = false;
             })
             .addCase(loadUser.rejected, (state) => {
+                console.log("Redux: loadUser rejected");
                 state.user = null;
                 state.loading = false;
             })
             // logout
             .addCase(logoutUser.fulfilled, (state) => {
+                console.log("Redux: logoutUser fulfilled");
                 state.user = null;
             });
     }

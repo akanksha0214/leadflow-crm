@@ -46,8 +46,18 @@ export const login = async (req, res) => {
 
     res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: false, // Set to false for localhost development
         sameSite: "lax",
+        domain: "localhost", // Explicitly set domain for localhost
+        maxAge: 24 * 60 * 60 * 1000
+    });
+    
+    console.log("Cookie set with token:", token);
+    console.log("Cookie settings:", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        domain: "localhost",
         maxAge: 24 * 60 * 60 * 1000
     });
 
@@ -62,7 +72,15 @@ export const login = async (req, res) => {
 //This helps React reload user after refresh.
 export const me = async (req, res) => {
     const user = await User.findById(req.user.id).select("-password");
-    res.json(user);
+    res.json({
+        success: true,
+        user: { 
+            id: user._id, 
+            name: user.name, 
+            email: user.email,
+            role: user.role 
+        }
+    });
 };
 
 
@@ -74,6 +92,18 @@ export const getAllUsers = async (req, res) => {
     } catch (error) {
         res.status(500).json({ msg: "Failed to fetch users" });
     }
+};
+
+export const logout = async (req, res) => {
+    res.cookie("token", "", {
+        httpOnly: true,
+        secure: false, // Set to false for localhost development
+        sameSite: "lax",
+        domain: "localhost", // Explicitly set domain for localhost
+        maxAge: 0
+    });
+    
+    res.json({ success: true });
 };
 
 export const enableCalendar = async (req, res) => {
