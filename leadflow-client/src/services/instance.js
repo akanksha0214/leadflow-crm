@@ -6,7 +6,7 @@ import axios from "axios";
 // export default axios;
 
 const instance = axios.create({
-    baseURL: "https://earnest-clafoutis-371f94.netlify.app",
+    baseURL: "https://leadflow-crm-1.onrender.com",
     withCredentials: true,
 });
 
