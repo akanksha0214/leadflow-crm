@@ -10,6 +10,10 @@ import {
   Badge,
   Menu,
   MenuItem,
+  Chip,
+  Tooltip,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -19,6 +23,7 @@ import { logoutUser } from "../redux/authSlice";
 import { useNavigate, useLocation } from "react-router-dom";
 import socket from "../services/socket";
 import api from "../services/instance";
+import "./Navbar.css";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -31,6 +36,62 @@ const Navbar = () => {
 
   const joinedRef = useRef(false);
   const open = Boolean(anchorEl);
+
+  // 🔊 Notification sound function
+  const playNotificationSound = () => {
+    try {
+      // Create audio context for better browser compatibility
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Create oscillator for pop sound
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      // Connect nodes
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Configure sound - short pop
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // Start frequency
+      oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1); // End frequency
+      
+      // Configure volume envelope
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime); // Start volume
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1); // Fade out
+      
+      // Play sound
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+      
+    } catch (error) {
+      // Fallback to HTML5 audio if Web Audio API fails
+      try {
+        const audio = new Audio("data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT");
+        audio.volume = 0.3;
+        audio.play().catch(() => {
+          // Silent fail if audio can't play
+        });
+      } catch (fallbackError) {
+        // Silent fail if both methods fail
+      }
+    }
+  };
+
+  // Helper function to format relative time
+  const formatRelativeTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -89,6 +150,9 @@ const Navbar = () => {
         const exists = prev.some(n => n._id === data._id);
         if (exists) return prev;
 
+        // 🔊 Play notification sound for new notification
+        playNotificationSound();
+
         return [data, ...prev];
       });
     };
@@ -140,80 +204,49 @@ const Navbar = () => {
     <AppBar
       position="sticky"
       elevation={0}
-      sx={{
-        backdropFilter: "blur(10px)",
-        background: "rgba(11,15,25,0.9)",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
-      }}
+      className="navbar-appbar"
     >
-      <Toolbar sx={{ px: 3, display: "flex", justifyContent: "space-between" }}>
+      <Toolbar className="navbar-toolbar">
         {/* LEFT — BRAND */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <Box
-            sx={{
-              width: 10,
-              height: 10,
-              borderRadius: "50%",
-              background: "linear-gradient(90deg,#00c6ff,#7f00ff)",
-            }}
-          />
-          <Typography variant="h6" sx={{ opacity: 0.5 }}>
+        <Box className="navbar-brand">
+          <Box className="navbar-brand-dot" />
+          <Typography variant="h6" className="navbar-brand-text" onClick={() => navigate("/dashboard")}>
             CRM
           </Typography>
         </Box>
 
         {/* RIGHT — ACTIONS */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Box className="navbar-actions">
           {user?.role === "admin" && (
             <Button
               onClick={() => navigate("/create-user")}
-              sx={{
-                textTransform: "none",
-                fontWeight: 500,
-                color:
-                  location.pathname === "/create-user"
-                    ? "#00c6ff"
-                    : "#bbb",
-                borderBottom:
-                  location.pathname === "/create-user"
-                    ? "2px solid #00c6ff"
-                    : "2px solid transparent",
-                borderRadius: 0,
-                "&:hover": {
-                  color: "#fff",
-                  background: "transparent",
-                },
-              }}
+              className={`navbar-nav-item ${location.pathname === "/create-user" ? "active" : ""}`}
             >
               Create User
             </Button>
           )}
-          {/* 📂 LEADS MENU */}
+          
+          {/* LEADS MENU */}
           <Button
             onClick={() => navigate("/leads")}
-            sx={{
-              textTransform: "none",
-              fontWeight: 500,
-              color: location.pathname === "/leads" ? "#00c6ff" : "#bbb",
-              borderBottom:
-                location.pathname === "/leads"
-                  ? "2px solid #00c6ff"
-                  : "2px solid transparent",
-              borderRadius: 0,
-              "&:hover": {
-                color: "#fff",
-                background: "transparent",
-              },
-            }}
+            className={`navbar-nav-item ${location.pathname === "/leads" ? "active" : ""}`}
           >
             Leads
           </Button>
+          
           <Divider orientation="vertical" flexItem />
 
-
-          <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
-            <Badge badgeContent={notifications.length} color="error">
-              <NotificationsIcon sx={{ color: "#fff" }} />
+          {/* NOTIFICATIONS */}
+          <IconButton 
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+            className="navbar-notification-btn"
+          >
+            <Badge 
+              badgeContent={notifications.length} 
+              color="error"
+              className="navbar-notification-badge"
+            >
+              <NotificationsIcon />
             </Badge>
           </IconButton>
 
@@ -221,31 +254,43 @@ const Navbar = () => {
             anchorEl={anchorEl}
             open={open}
             onClose={handleMenuClose}
-            PaperProps={{
-              sx: {
-                width: 360,
-                background: "#0f1629",
-                border: "1px solid rgba(255,255,255,0.08)",
-              },
+            className="navbar-notification-menu"
+            PaperProps={{ className: "navbar-menu-paper" }}
+            transformOrigin={{
+              horizontal: { xs: 'center', sm: 'right', md: 'right' },
+              vertical: 'top'
+            }}
+            anchorOrigin={{
+              horizontal: { xs: 'center', sm: 'right', md: 'right' },
+              vertical: 'bottom'
+            }}
+            MenuListProps={{
+              className: "navbar-notification-list"
             }}
           >
             {/* HEADER */}
-            <Box
-              sx={{
-                px: 2,
-                py: 1,
-                display: "flex",
-                justifyContent: "space-between",
-                borderBottom: "1px solid rgba(255,255,255,0.08)",
-              }}
-            >
-              <Typography fontWeight={600}>Notifications</Typography>
+            <Box className="navbar-notification-header">
+              <Box className="navbar-notification-title-section">
+                <Box className="navbar-notification-title-content">
+                  <Box className="navbar-notification-indicator" />
+                  <Typography className="navbar-notification-title">
+                    Notifications
+                  </Typography>
+                </Box>
+                {notifications.length > 0 && (
+                  <Chip 
+                    label={notifications.length} 
+                    size="small"
+                    className="navbar-notification-count"
+                  />
+                )}
+              </Box>
 
               {notifications.length > 0 && (
                 <Button
                   size="small"
                   onClick={handleClearNotifications}
-                  sx={{ textTransform: "none", color: "#00c6ff" }}
+                  className="navbar-clear-btn"
                 >
                   Clear all
                 </Button>
@@ -253,44 +298,52 @@ const Navbar = () => {
             </Box>
 
             {/* BODY */}
-            {notifications.length === 0 ? (
-              <MenuItem sx={{ opacity: 0.6 }}>
-                No new notifications
-              </MenuItem>
-            ) : (
-              notifications.map((n) => (
-                <MenuItem key={n._id} sx={{ alignItems: "flex-start" }}>
-                  <Box>
-                    <Typography variant="body2">
-                      {n.message}
-                    </Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                      {new Date(n.createdAt).toLocaleString()}
-                    </Typography>
+            <Box className="navbar-notification-body">
+              {notifications.length === 0 ? (
+                <Box className="navbar-notification-empty">
+                  <Box className="navbar-empty-icon-container">
+                    <NotificationsIcon className="navbar-empty-icon" />
                   </Box>
-                </MenuItem>
-              ))
-            )}
+                  <Typography variant="h6" className="navbar-empty-title">
+                    No notifications
+                  </Typography>
+                  <Typography variant="body2" className="navbar-empty-subtitle">
+                    You're all caught up!
+                  </Typography>
+                </Box>
+              ) : (
+                notifications.map((n, index) => (
+                  <MenuItem
+                    key={n._id}
+                    onClick={handleMenuClose}
+                    className="navbar-notification-item"
+                  >
+                    <Box className="navbar-notification-content">
+                      <Box className="navbar-notification-indicator-dot" />
+                      <Box className="navbar-notification-text">
+                        <Typography className="navbar-notification-message">
+                          {n.message}
+                        </Typography>
+                        <Typography className="navbar-notification-time">
+                          {formatRelativeTime(n.createdAt)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </MenuItem>
+                ))
+              )}
+            </Box>
           </Menu>
 
           {/* USER INFO */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <Avatar
-              sx={{
-                width: 36,
-                height: 36,
-                background:
-                  "linear-gradient(135deg,#7f00ff,#00c6ff)",
-              }}
-            >
+          <Box className="navbar-user-info">
+            <Avatar className="navbar-avatar">
               {user?.name?.charAt(0).toUpperCase()}
             </Avatar>
 
-            <Box>
+            <Box className="navbar-user-details">
               <Typography variant="body2">{user?.name}</Typography>
-              <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                {user?.role}
-              </Typography>
+              <Typography variant="caption">{user?.role}</Typography>
             </Box>
           </Box>
 
@@ -298,7 +351,7 @@ const Navbar = () => {
           <Button
             onClick={handleLogout}
             startIcon={<LogoutIcon />}
-            sx={{ color: "#bbb" }}
+            className="navbar-logout-btn"
           >
             Logout
           </Button>

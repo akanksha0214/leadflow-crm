@@ -47,11 +47,11 @@ export const getDashboardStats = async (req, res) => {
 
         const newLeads = await Leads.countDocuments({ status: "new" });
 
-        const closedLeads = await Leads.countDocuments({ status: "closed" });
+        const closedLeads = await Leads.countDocuments({ status: "converted" });
 
         const followUpsDue = await Leads.countDocuments({
             next_followup_date: { $lte: new Date() },
-            status: { $ne: "closed" },
+            status: { $ne: "converted" },
         });
 
         res.json({

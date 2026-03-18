@@ -9,21 +9,26 @@ import {
   TableCell,
   TableBody,
   Chip,
+  TextField,
+  InputAdornment,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import SearchIcon from "@mui/icons-material/Search";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import CreateLeadModal from "../components/modal/CreateLeadModal";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import IconButton from "@mui/material/IconButton";
-import api from "../services/instance";
-import dayjs from "dayjs";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import Tooltip from "@mui/material/Tooltip";
 import SetFollowUpModal from "../components/modal/SetFollowUpModal";
 import LeadActivityModal from "../components/modal/LeadActivityModal";
+import api from "../services/instance";
+import dayjs from "dayjs";
 import toast from "react-hot-toast";
+import socket from "../services/socket";
+import "./Leads.css";
 
 const Leads = () => {
   const [leads, setLeads] = useState([]);
@@ -32,6 +37,7 @@ const Leads = () => {
   const [followUpModalOpen, setFollowUpModalOpen] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
   const [activityOpen, setActivityOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const isOverdue = (lead) =>
     lead.next_followup_date &&
@@ -122,177 +128,252 @@ const Leads = () => {
     fetchLeads();
   }, []);
 
-  const sortedLeads = [...leads].sort((a, b) => {
-    const aOverdue = isOverdue(a);
-    const bOverdue = isOverdue(b);
+  const sortedLeads = [...leads]
+    .filter((lead) =>
+      lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.phone.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      const aOverdue = isOverdue(a);
+      const bOverdue = isOverdue(b);
 
-    if (aOverdue && !bOverdue) return -1;
-    if (!aOverdue && bOverdue) return 1;
-    return 0;
-  });
-
+      if (aOverdue && !bOverdue) return -1;
+      if (!aOverdue && bOverdue) return 1;
+      return 0;
+    });
 
   return (
     <DashboardLayout>
-      {/* Header */}
-      <Box
-        sx={{
-          mb: 3,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h5" fontWeight="bold">
-          Leads
+      {/* Modern Header Section */}
+      <Box className="leads-header">
+        <Typography variant="h4" className="leads-main-title">
+          Leads Management
         </Typography>
 
-        <Button
-          startIcon={<AddCircleOutlineIcon />}
-          onClick={() => setOpen(true)}
-          sx={{
-            background: "linear-gradient(90deg,#00c6ff,#0072ff)",
-            color: "#fff",
-            fontWeight: 600,
-          }}
-        >
-          Add Lead
-        </Button>
+        <Box className="leads-search-container">
+          {/* Search Bar */}
+          <TextField
+            placeholder="Search leads..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            size="small"
+            fullWidth={{ xs: true, sm: false }}
+            className="leads-search-field"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "#64748b", fontSize: { xs: "16px", sm: "18px" } }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          {/* Add Lead Button */}
+          <Button
+            variant="contained"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={() => setOpen(true)}
+            fullWidth={{ xs: true, sm: false }}
+            className="leads-add-button"
+          >
+            Add Lead
+          </Button>
+        </Box>
       </Box>
 
-      {/* Leads Table */}
-      {sortedLeads.length === 0 ? (
-        <Box
-          sx={{
-            minHeight: "300px",        // gives vertical space
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-          }}>
-          <Typography variant="h6" sx={{ color: "#fff", mb: 1 }}>
-            No Leads Yet
+      {/* Stats Cards */}
+      <Box className="leads-stats-container">
+        <Paper className="leads-stat-card total">
+          <Typography variant="h6" className="leads-stat-label">
+            Total Leads
           </Typography>
-        </Box>
-      ) : (
-        <Paper
-          sx={{
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 3,
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ color: "#fff" }}>Name</TableCell>
-                <TableCell sx={{ color: "#fff" }}>Email</TableCell>
-                <TableCell sx={{ color: "#fff" }}>Phone</TableCell>
-                <TableCell sx={{ color: "#fff" }}>Follow Up Date</TableCell>
-                <TableCell sx={{ color: "#fff" }}>Source</TableCell>
-                <TableCell sx={{ color: "#fff" }}>Status</TableCell>
-                <TableCell sx={{ color: "#fff" }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
+          <Typography variant="h4" className="leads-stat-number">
+            {leads.length}
+          </Typography>
+        </Paper>
 
+        <Paper className="leads-stat-card new">
+          <Typography variant="h6" className="leads-stat-label">
+            New Leads
+          </Typography>
+          <Typography variant="h4" className="leads-stat-number">
+            {leads.filter((lead) => lead.status === "new").length}
+          </Typography>
+        </Paper>
+
+        <Paper className="leads-stat-card interested">
+          <Typography variant="h6" className="leads-stat-label">
+            Interested
+          </Typography>
+          <Typography variant="h4" className="leads-stat-number">
+            {leads.filter((lead) => lead.status === "interested").length}
+          </Typography>
+        </Paper>
+      </Box>
+
+      {/* Enhanced Leads Table */}
+      {sortedLeads.length === 0 ? (
+        <Paper className="leads-empty-state">
+          <Box className="leads-empty-content">
+            <Box className="leads-empty-icon-wrapper">
+              <Typography className="leads-empty-emoji">
+                📋
+              </Typography>
+            </Box>
+            <Typography variant="h6" className="leads-empty-title">
+              No leads found
+            </Typography>
+            <Typography variant="body1" className="leads-empty-subtitle">
+              Try adjusting your search criteria or add new leads to get started.
+            </Typography>
+          </Box>
+        </Paper>
+      ) : (
+        <Box className="leads-table-container">
+          <Box className="leads-table-wrapper">
+            <Paper className="leads-table-paper">
+              <Table className="leads-table">
+                <TableHead>
+                  <TableRow className="leads-table-head">
+                    <TableCell className="leads-header-cell name">
+                      Name
+                    </TableCell>
+                    <TableCell className="leads-header-cell email">
+                      Email
+                    </TableCell>
+                    <TableCell className="leads-header-cell phone">
+                      Phone
+                    </TableCell>
+                    <TableCell className="leads-header-cell followup">
+                      Follow Up
+                    </TableCell>
+                    <TableCell className="leads-header-cell source">
+                      Source
+                    </TableCell>
+                    <TableCell className="leads-header-cell status">
+                      Status
+                    </TableCell>
+                    <TableCell className="leads-header-cell actions">
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
             <TableBody>
               {sortedLeads.map((l) => (
                 <TableRow
                   key={l._id}
-                  sx={{
-                    backgroundColor: isOverdue(l)
-                      ? "rgba(255, 77, 77, 0.08)"
-                      : "transparent",
-                  }}
+                  className={`leads-table-row ${isOverdue(l) ? 'overdue' : ''}`}
                 >
-                  <TableCell sx={{ color: "#ddd" }}>{l.name}</TableCell>
-                  <TableCell sx={{ color: "#aaa" }}>{l.email || "-"}</TableCell>
-                  <TableCell sx={{ color: "#aaa" }}>{l.phone || "-"}</TableCell>
-                  <TableCell sx={{ color: "#aaa" }}>
-                    {l.next_followup_date
-                      ? dayjs(l.next_followup_date).format("DD MMM YYYY, hh:mm A")
-                      : "-"}
+                  <TableCell className="leads-body-cell name">
+                    {l.name}
                   </TableCell>
-
-                  <TableCell sx={{ color: "#aaa", textTransform: "capitalize" }}>
-                    {l.source}
+                  <TableCell className="leads-body-cell email">
+                    {l.email || "-"}
                   </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={l.status}
-                      size="small"
-                      sx={{
-                        textTransform: "capitalize",
-                        background: isOverdue(l)
-                          ? "rgba(255, 77, 77, 0.25)"
-                          : "rgba(0,198,255,0.2)",
-                        color: "#fff",
-                      }}
-                    />
-
+                  <TableCell className="leads-body-cell phone">
+                    {l.phone || "-"}
                   </TableCell>
-
-                  {/* ACTIONS */}
-                  <TableCell>
-                    <IconButton
-                      onClick={() => {
-                        setSelectedLead(l);
-                        setOpen(true);
-                      }}
-                      sx={{ color: "#00c6ff" }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-
-                    <IconButton
-                      onClick={() => handleDelete(l._id)}
-                      sx={{ color: "#ff6b6b" }}
-                    >
-                      <DeleteOutlineIcon />
-                    </IconButton>
-
-                    {l.next_followup_date && (
-                      <Tooltip title="Mark follow-up done">
+                  <TableCell className="leads-body-cell followup">
+                    <Box className="leads-chip-container">
+                      {l.next_followup_date && (
+                        <Tooltip title={`Follow up: ${dayjs(l.next_followup_date).format("DD MMM YYYY, hh:mm A")}`} arrow>
+                          <Box className={`leads-followup-badge ${isOverdue(l) ? 'overdue' : 'normal'}`}>
+                            <Typography className="leads-followup-date">
+                              {dayjs(l.next_followup_date).format("DD MMM")}
+                            </Typography>
+                          </Box>
+                        </Tooltip>
+                      )}
+                    </Box>
+                  </TableCell>
+                  <TableCell className="leads-body-cell source">
+                    <Box className="leads-chip-container">
+                      <Chip
+                        label={l.source}
+                        size="small"
+                        className="leads-source-chip"
+                      />
+                    </Box>
+                  </TableCell>
+                  <TableCell className="leads-body-cell status">
+                    <Box className="leads-chip-container">
+                      <Chip
+                        label={l.status}
+                        size="small"
+                        className={`leads-status-chip ${l.status}`}
+                      />
+                    </Box>
+                  </TableCell>
+                  <TableCell className="leads-body-cell actions">
+                    <Box className="leads-actions-container">
+                      <Tooltip title="Edit" arrow>
                         <IconButton
-                          onClick={() => handleFollowUpDone(l._id)}
-                          sx={{
-                            color: isOverdue(l) ? "#ff6b6b" : "#00c6ff",
+                          size="small"
+                          onClick={() => {
+                            setSelectedLead(l);
+                            setOpen(true);
                           }}
+                          className="leads-action-button leads-edit-button"
                         >
-                          <CheckCircleOutlineIcon />
+                          <EditIcon className="leads-action-icon"/>
                         </IconButton>
                       </Tooltip>
-                    )}
 
-                    {!l.next_followup_date && (
+                      {l.next_followup_date && (
+                        <Tooltip title="Done" arrow>
+                          <IconButton
+                            onClick={() => handleFollowUpDone(l._id)}
+                            className={`leads-action-button leads-done-button ${isOverdue(l) ? 'overdue' : 'normal'}`}
+                          >
+                            <CheckCircleOutlineIcon className="leads-action-icon"/>
+                          </IconButton>
+                        </Tooltip>
+                      )}
+
+                      {!l.next_followup_date && (
+                        <Button
+                          size="small"
+                          onClick={() => {
+                            setSelectedLeadId(l._id);
+                            setFollowUpModalOpen(true);
+                          }}
+                          className="leads-followup-button"
+                        >
+                          Follow-up
+                        </Button>
+                      )}
+                      
                       <Button
                         size="small"
                         onClick={() => {
                           setSelectedLeadId(l._id);
-                          setFollowUpModalOpen(true);
+                          setActivityOpen(true);
                         }}
+                        className="leads-activity-button"
                       >
-                        Set Next Follow-up
+                        Activity
                       </Button>
-                    )}
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        setSelectedLeadId(l._id);
-                        setActivityOpen(true);
-                      }}
-                    >
-                      View Activity
-                    </Button>
 
-
+                      <Tooltip title="Delete" arrow>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(l._id)}
+                          className="leads-action-button leads-delete-button"
+                        >
+                          <DeleteOutlineIcon className="leads-action-icon"/>
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                 </TableRow>
 
               ))}
             </TableBody>
           </Table>
-        </Paper>
+            </Paper>
+          </Box>
+        </Box>
       )}
 
       {/* Modal */}

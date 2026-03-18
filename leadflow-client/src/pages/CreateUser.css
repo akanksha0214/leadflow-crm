@@ -1,0 +1,605 @@
+/* CreateUser.css - Styles for Users Management Page */
+
+/* Header Section */
+.users-header {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+}
+
+.users-header-content {
+  flex: 1;
+}
+
+.users-main-title {
+  font-weight: 700;
+  color: #fff;
+  font-size: 28px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.users-subtitle {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.users-create-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.users-create-button:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(102, 126, 234, 0.4);
+}
+
+/* Stats Cards */
+.users-stats-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.users-stats-card {
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.users-stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.users-stats-card.total {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.users-stats-card.total:hover {
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
+}
+
+.users-stats-card.admin {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 8px 32px rgba(240, 147, 251, 0.2);
+  border: 1px solid rgba(240, 147, 251, 0.2);
+}
+
+.users-stats-card.admin:hover {
+  box-shadow: 0 12px 40px rgba(240, 147, 251, 0.3);
+}
+
+.users-stats-card.regular {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  box-shadow: 0 8px 32px rgba(79, 172, 254, 0.2);
+  border: 1px solid rgba(79, 172, 254, 0.2);
+}
+
+.users-stats-card.regular:hover {
+  box-shadow: 0 12px 40px rgba(79, 172, 254, 0.3);
+}
+
+.users-stats-number {
+  font-weight: 700;
+  color: #fff;
+  font-size: 28px;
+}
+
+.users-stats-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+}
+
+/* Search Bar */
+.users-search-container {
+  margin-bottom: 24px;
+}
+
+.users-search-field {
+  width: 100%;
+}
+
+.users-search-field .MuiOutlinedInput-root {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  color: #fff;
+  font-size: 15px;
+}
+
+.users-search-field .MuiOutlinedInput-root:hover {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.users-search-field .MuiOutlinedInput-root.Mui-focused {
+  border: 1px solid #667eea;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.users-search-field .MuiOutlinedInput-root fieldset {
+  border: none;
+}
+
+.users-search-field .MuiInputBase-input {
+  color: #fff;
+  padding: 16px 14px;
+}
+
+.users-search-field .MuiInputLabel-root {
+  color: #94a3b8;
+}
+
+.users-search-icon {
+  color: #94a3b8;
+}
+
+/* Empty State */
+.users-empty-state {
+  background: linear-gradient(145deg, #1a1f36 0%, #0f172a 100%);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 48px;
+  text-align: center;
+}
+
+.users-empty-title {
+  color: #94a3b8;
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.users-empty-subtitle {
+  color: #64748b;
+  font-size: 15px;
+}
+
+/* Table Container */
+.users-table-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.users-table-wrapper {
+  min-width: 600px;
+}
+
+.users-table-paper {
+  background: linear-gradient(145deg, #1a1f36 0%, #0f172a 100%);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  width: 100%;
+}
+
+.users-table {
+  min-width: 600px;
+  table-layout: fixed;
+}
+
+/* Table Header */
+.users-table-head {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+}
+
+.users-header-cell {
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  padding: 16px 0;
+  border-bottom: none;
+}
+
+.users-header-cell.name {
+  width: 180px;
+  padding-left: 12px;
+}
+
+.users-header-cell.email {
+  width: 220px;
+}
+
+.users-header-cell.role {
+  width: 140px;
+}
+
+/* Table Body */
+.users-table-row {
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.users-table-row:hover {
+  background-color: rgba(102, 126, 234, 0.04);
+}
+
+.users-body-cell {
+  color: #e2e8f0;
+  font-size: 13px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+  font-weight: 500;
+}
+
+.users-body-cell.name {
+  width: 180px;
+  padding-left: 12px;
+}
+
+.users-body-cell.email {
+  color: #94a3b8;
+  font-size: 12px;
+  width: 220px;
+}
+
+.users-body-cell.role {
+  color: #94a3b8;
+  font-size: 13px;
+  width: 140px;
+  border-bottom: none;
+}
+
+/* Role Chip */
+.users-role-chip {
+  text-transform: capitalize;
+  font-weight: 600;
+  font-size: 11px;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.users-role-chip.admin {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.users-role-chip.user {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .users-header {
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+  
+  .users-main-title {
+    font-size: 24px;
+  }
+  
+  .users-subtitle {
+    font-size: 12px;
+  }
+  
+  .users-create-button {
+    font-size: 12px;
+    padding: 8px 16px;
+  }
+  
+  .users-stats-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .users-stats-card {
+    padding: 16px;
+  }
+  
+  .users-stats-number {
+    font-size: 24px;
+  }
+  
+  .users-stats-label {
+    font-size: 12px;
+  }
+  
+  .users-search-container {
+    margin-bottom: 16px;
+  }
+  
+  .users-search-field .MuiInputBase-input {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+  
+  .users-empty-state {
+    padding: 32px 16px;
+  }
+  
+  .users-empty-title {
+    font-size: 16px;
+  }
+  
+  .users-empty-subtitle {
+    font-size: 14px;
+  }
+  
+  .users-table-wrapper {
+    min-width: 500px;
+  }
+  
+  .users-table {
+    min-width: 500px;
+  }
+  
+  .users-header-cell {
+    font-size: 12px;
+    padding: 8px 0;
+  }
+  
+  .users-header-cell.name {
+    width: 150px;
+    padding-left: 8px;
+  }
+  
+  .users-header-cell.email {
+    width: 200px;
+  }
+  
+  .users-header-cell.role {
+    width: 120px;
+  }
+  
+  .users-body-cell {
+    font-size: 12px;
+    padding: 8px 0;
+  }
+  
+  .users-body-cell.name {
+    width: 150px;
+    padding-left: 8px;
+  }
+  
+  .users-body-cell.email {
+    font-size: 11px;
+    width: 200px;
+  }
+  
+  .users-body-cell.role {
+    font-size: 12px;
+    width: 120px;
+  }
+  
+  .users-role-chip {
+    font-size: 10px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .users-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+  }
+  
+  .users-main-title {
+    font-size: 28px;
+  }
+  
+  .users-subtitle {
+    font-size: 13px;
+  }
+  
+  .users-create-button {
+    font-size: 13px;
+    padding: 12px 20px;
+  }
+  
+  .users-stats-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .users-stats-card {
+    padding: 20px;
+  }
+  
+  .users-stats-number {
+    font-size: 28px;
+  }
+  
+  .users-stats-label {
+    font-size: 13px;
+  }
+  
+  .users-search-container {
+    margin-bottom: 20px;
+  }
+  
+  .users-search-field .MuiInputBase-input {
+    padding: 16px 14px;
+    font-size: 15px;
+  }
+  
+  .users-empty-state {
+    padding: 40px 24px;
+  }
+  
+  .users-empty-title {
+    font-size: 18px;
+  }
+  
+  .users-empty-subtitle {
+    font-size: 15px;
+  }
+  
+  .users-table-wrapper {
+    min-width: 600px;
+  }
+  
+  .users-table {
+    min-width: 600px;
+  }
+  
+  .users-header-cell {
+    font-size: 13px;
+    padding: 12px 0;
+  }
+  
+  .users-header-cell.name {
+    width: 180px;
+    padding-left: 10px;
+  }
+  
+  .users-header-cell.email {
+    width: 220px;
+  }
+  
+  .users-header-cell.role {
+    width: 140px;
+  }
+  
+  .users-body-cell {
+    font-size: 13px;
+    padding: 12px 0;
+  }
+  
+  .users-body-cell.name {
+    width: 180px;
+    padding-left: 10px;
+  }
+  
+  .users-body-cell.email {
+    font-size: 12px;
+    width: 220px;
+  }
+  
+  .users-body-cell.role {
+    font-size: 13px;
+    width: 140px;
+  }
+  
+  .users-role-chip {
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .users-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+  }
+  
+  .users-main-title {
+    font-size: 32px;
+  }
+  
+  .users-subtitle {
+    font-size: 14px;
+  }
+  
+  .users-create-button {
+    font-size: 14px;
+    padding: 16px 32px;
+  }
+  
+  .users-stats-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  
+  .users-stats-card {
+    padding: 24px;
+  }
+  
+  .users-stats-number {
+    font-size: 32px;
+  }
+  
+  .users-stats-label {
+    font-size: 14px;
+  }
+  
+  .users-search-container {
+    margin-bottom: 24px;
+  }
+  
+  .users-search-field .MuiInputBase-input {
+    padding: 16px 14px;
+    font-size: 16px;
+  }
+  
+  .users-empty-state {
+    padding: 48px 32px;
+  }
+  
+  .users-empty-title {
+    font-size: 20px;
+  }
+  
+  .users-empty-subtitle {
+    font-size: 16px;
+  }
+  
+  .users-table-wrapper {
+    min-width: 100%;
+  }
+  
+  .users-table {
+    min-width: 100%;
+  }
+  
+  .users-header-cell {
+    font-size: 14px;
+    padding: 16px 0;
+  }
+  
+  .users-header-cell.name {
+    width: auto;
+  }
+  
+  .users-header-cell.email {
+    width: auto;
+  }
+  
+  .users-header-cell.role {
+    width: auto;
+  }
+  
+  .users-body-cell {
+    font-size: 14px;
+    padding: 16px 0;
+  }
+  
+  .users-body-cell.name {
+    width: auto;
+  }
+  
+  .users-body-cell.email {
+    font-size: 13px;
+    width: auto;
+  }
+  
+  .users-body-cell.role {
+    font-size: 14px;
+    width: auto;
+  }
+  
+  .users-role-chip {
+    font-size: 12px;
+  }
+}
