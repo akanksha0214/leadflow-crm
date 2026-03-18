@@ -6,7 +6,7 @@ import axios from "axios";
 // export default axios;
 
 const instance = axios.create({
-    baseURL: "https://leadflow-crm-1.onrender.com",
+    baseURL: "http://localhost:5000",
     withCredentials: true,
 });
 
