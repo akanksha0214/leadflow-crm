@@ -6,7 +6,7 @@ import axios from "axios";
 // export default axios;
 
 const instance = axios.create({
-    baseURL: "http://localhost:5000",
+    baseURL: "https://earnest-clafoutis-371f94.netlify.app",
     withCredentials: true,
 });
 
